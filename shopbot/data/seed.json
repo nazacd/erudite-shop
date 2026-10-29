@@ -1,0 +1,22 @@
+{
+  "pickup_address": "г. Ташкент, ул. Примерная, 1 (демо-адрес)",
+  "categories": [
+    { "id": "tshirts", "name": "👕 Футболки" },
+    { "id": "accessories", "name": "🎒 Аксессуары" },
+    { "id": "home", "name": "🏠 Для дома" }
+  ],
+  "products": [
+    { "id": "p1", "category_id": "tshirts", "name": "Футболка Classic", "description": "Хлопок 100%, базовая белая.", "price": 120000, "photo_url": "https://picsum.photos/seed/p1/600/400" },
+    { "id": "p2", "category_id": "tshirts", "name": "Футболка Oversize", "description": "Свободный крой, чёрная.", "price": 150000, "photo_url": "https://picsum.photos/seed/p2/600/400" },
+    { "id": "p3", "category_id": "tshirts", "name": "Футболка Sport", "description": "Дышащая ткань для тренировок.", "price": 135000, "photo_url": "https://picsum.photos/seed/p3/600/400" },
+    { "id": "p4", "category_id": "tshirts", "name": "Футболка Print", "description": "С принтом, лимитированная серия.", "price": 175000, "photo_url": "https://picsum.photos/seed/p4/600/400" },
+    { "id": "p5", "category_id": "accessories", "name": "Рюкзак Urban", "description": "Вместительный, с отделом для ноутбука.", "price": 320000, "photo_url": "https://picsum.photos/seed/p5/600/400" },
+    { "id": "p6", "category_id": "accessories", "name": "Кепка Street", "description": "Регулируемый размер.", "price": 90000, "photo_url": "https://picsum.photos/seed/p6/600/400" },
+    { "id": "p7", "category_id": "accessories", "name": "Бутылка для воды", "description": "Сталь, 750 мл.", "price": 110000, "photo_url": "https://picsum.photos/seed/p7/600/400" },
+    { "id": "p8", "category_id": "accessories", "name": "Шоппер", "description": "Плотный хлопок, на каждый день.", "price": 65000, "photo_url": "https://picsum.photos/seed/p8/600/400" },
+    { "id": "p9", "category_id": "home", "name": "Кружка Morning", "description": "Керамика, 350 мл.", "price": 55000, "photo_url": "https://picsum.photos/seed/p9/600/400" },
+    { "id": "p10", "category_id": "home", "name": "Плед Cozy", "description": "Мягкий флис, 150×200 см.", "price": 240000, "photo_url": "https://picsum.photos/seed/p10/600/400" },
+    { "id": "p11", "category_id": "home", "name": "Свеча Aroma", "description": "Соевый воск, аромат ванили.", "price": 80000, "photo_url": "https://picsum.photos/seed/p11/600/400" },
+    { "id": "p12", "category_id": "home", "name": "Подушка Soft", "description": "Декоративная, 40×40 см.", "price": 95000, "photo_url": "https://picsum.photos/seed/p12/600/400" }
+  ]
+}
