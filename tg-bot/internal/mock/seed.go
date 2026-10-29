@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"shopbot/internal/backend"
+	"tg-bot/internal/backend"
 )
 
 type Seed struct {

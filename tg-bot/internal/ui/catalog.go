@@ -10,8 +10,8 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 
-	"shopbot/internal/backend"
-	"shopbot/internal/texts"
+	"tg-bot/internal/backend"
+	"tg-bot/internal/texts"
 )
 
 // backTo is a keyboard with one "Назад" button.

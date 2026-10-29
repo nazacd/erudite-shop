@@ -8,10 +8,10 @@ import (
 
 	"github.com/go-telegram/bot"
 
-	"shopbot/internal/backend"
-	"shopbot/internal/config"
-	"shopbot/internal/mock"
-	"shopbot/internal/ui"
+	"tg-bot/internal/backend"
+	"tg-bot/internal/config"
+	"tg-bot/internal/mock"
+	"tg-bot/internal/ui"
 )
 
 func main() {

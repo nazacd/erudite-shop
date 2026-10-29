@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"sync"
 
-	"shopbot/internal/backend"
+	"tg-bot/internal/backend"
 )
 
 type Backend struct {

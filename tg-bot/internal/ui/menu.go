@@ -6,7 +6,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 
-	"shopbot/internal/texts"
+	"tg-bot/internal/texts"
 )
 
 func mainMenu() *models.InlineKeyboardMarkup {

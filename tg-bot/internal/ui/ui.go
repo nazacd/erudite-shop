@@ -7,7 +7,7 @@ import (
 	"github.com/go-telegram/bot"
 	"github.com/go-telegram/bot/models"
 
-	"shopbot/internal/backend"
+	"tg-bot/internal/backend"
 )
 
 type UI struct {
