@@ -14,21 +14,21 @@ import (
 	"tg-bot/internal/texts"
 )
 
-// backTo is a keyboard with one "Назад" button.
-func backTo(data string) *models.InlineKeyboardMarkup {
+// backTo is a keyboard with one "Back" button.
+func backTo(t *texts.Texts, data string) *models.InlineKeyboardMarkup {
 	return &models.InlineKeyboardMarkup{
 		InlineKeyboard: [][]models.InlineKeyboardButton{
-			{{Text: texts.Back, CallbackData: data}},
+			{{Text: t.Back, CallbackData: data}},
 		},
 	}
 }
 
 // showCategories: the list of categories, one button per row.
-func (u *UI) showCategories(ctx context.Context, b *bot.Bot, msg *models.Message) {
+func (u *UI) showCategories(ctx context.Context, b *bot.Bot, msg *models.Message, t *texts.Texts) {
 	cats, err := u.be.Categories(ctx)
 	if err != nil {
 		logErr("categories", err)
-		showText(ctx, b, msg, texts.SomethingWrong+texts.DemoBadge, backTo("menu:home"))
+		showText(ctx, b, msg, t.SomethingWrong+t.DemoBadge, backTo(t, "menu:home"))
 		return
 	}
 
@@ -38,11 +38,12 @@ func (u *UI) showCategories(ctx context.Context, b *bot.Bot, msg *models.Message
 			{Text: c.Name, CallbackData: "cat:" + c.ID},
 		})
 	}
-	rows = append(rows, []models.InlineKeyboardButton{
-		{Text: texts.Back, CallbackData: "menu:home"},
-	})
+	rows = append(rows,
+		[]models.InlineKeyboardButton{{Text: t.SizeGuideButton, CallbackData: "size:menu:catalog"}},
+		[]models.InlineKeyboardButton{{Text: t.Back, CallbackData: "menu:home"}},
+	)
 
-	showText(ctx, b, msg, texts.CatalogTitle+texts.DemoBadge,
+	showText(ctx, b, msg, t.CatalogTitle+t.DemoBadge,
 		&models.InlineKeyboardMarkup{InlineKeyboard: rows})
 }
 
@@ -53,30 +54,31 @@ func (u *UI) category(ctx context.Context, b *bot.Bot, update *models.Update) {
 	if msg == nil {
 		return
 	}
+	t := u.t(update.CallbackQuery.From)
 	categoryID := strings.TrimPrefix(update.CallbackQuery.Data, "cat:")
 
 	products, err := u.be.ProductsByCategory(ctx, categoryID)
 	if err != nil {
 		logErr("products", err)
-		showText(ctx, b, msg, texts.SomethingWrong+texts.DemoBadge, backTo("menu:catalog"))
+		showText(ctx, b, msg, t.SomethingWrong+t.DemoBadge, backTo(t, "menu:catalog"))
 		return
 	}
 	if len(products) == 0 {
-		showText(ctx, b, msg, texts.EmptyCategory+texts.DemoBadge, backTo("menu:catalog"))
+		showText(ctx, b, msg, t.EmptyCategory+t.DemoBadge, backTo(t, "menu:catalog"))
 		return
 	}
 
 	var rows [][]models.InlineKeyboardButton
 	for _, p := range products {
 		rows = append(rows, []models.InlineKeyboardButton{
-			{Text: p.Name + " — " + texts.FormatSum(p.Price), CallbackData: "prod:" + p.ID},
+			{Text: p.Name + " — " + t.FormatSum(p.Price), CallbackData: "prod:" + p.ID},
 		})
 	}
 	rows = append(rows, []models.InlineKeyboardButton{
-		{Text: texts.Back, CallbackData: "menu:catalog"},
+		{Text: t.Back, CallbackData: "menu:catalog"},
 	})
 
-	showText(ctx, b, msg, texts.ChooseProduct+texts.DemoBadge,
+	showText(ctx, b, msg, t.ChooseProduct+t.DemoBadge,
 		&models.InlineKeyboardMarkup{InlineKeyboard: rows})
 }
 
@@ -87,24 +89,25 @@ func (u *UI) product(ctx context.Context, b *bot.Bot, update *models.Update) {
 	if msg == nil {
 		return
 	}
+	t := u.t(update.CallbackQuery.From)
 	productID := strings.TrimPrefix(update.CallbackQuery.Data, "prod:")
 
 	p, err := u.be.Product(ctx, productID)
 	if errors.Is(err, backend.ErrNotFound) {
-		showText(ctx, b, msg, texts.ProductGone+texts.DemoBadge, backTo("menu:catalog"))
+		showText(ctx, b, msg, t.ProductGone+t.DemoBadge, backTo(t, "menu:catalog"))
 		return
 	}
 	if err != nil {
 		logErr("product", err)
-		showText(ctx, b, msg, texts.SomethingWrong+texts.DemoBadge, backTo("menu:catalog"))
+		showText(ctx, b, msg, t.SomethingWrong+t.DemoBadge, backTo(t, "menu:catalog"))
 		return
 	}
 
-	caption := fmt.Sprintf("%s\n\n%s\n\n💰 %s", p.Name, p.Description, texts.FormatSum(p.Price)) + texts.DemoBadge
+	caption := fmt.Sprintf("%s\n\n%s\n\n💰 %s", p.Name, p.Description, t.FormatSum(p.Price)) + t.DemoBadge
 	kb := &models.InlineKeyboardMarkup{
 		InlineKeyboard: [][]models.InlineKeyboardButton{
-			{{Text: texts.AddToCart, CallbackData: "add:" + p.ID}},
-			{{Text: texts.Back, CallbackData: "cat:" + p.CategoryID}},
+			{{Text: t.AddToCart, CallbackData: "add:" + p.ID}},
+			{{Text: t.Back, CallbackData: "cat:" + p.CategoryID}},
 		},
 	}
 
@@ -127,12 +130,33 @@ func (u *UI) product(ctx context.Context, b *bot.Bot, update *models.Update) {
 	logErr("delete", err)
 }
 
-// addToCart is a placeholder until Lesson 4.
+// addToCart puts the product into the user's cart and confirms with a short pop-up.
 func (u *UI) addToCart(ctx context.Context, b *bot.Bot, update *models.Update) {
-	_, err := b.AnswerCallbackQuery(ctx, &bot.AnswerCallbackQueryParams{
-		CallbackQueryID: update.CallbackQuery.ID,
-		Text:            texts.AddToCartSoon,
-		ShowAlert:       true,
-	})
-	logErr("answer", err)
+	user := update.CallbackQuery.From
+	t := u.t(user)
+	productID := strings.TrimPrefix(update.CallbackQuery.Data, "add:")
+
+	err := u.be.AddToCart(ctx, user.ID, productID)
+	switch {
+	case errors.Is(err, backend.ErrNotFound):
+		answer(ctx, b, update, t.ProductGone)
+	case err != nil:
+		logErr("add to cart", err)
+		answer(ctx, b, update, t.SomethingWrong)
+	default:
+		answer(ctx, b, update, t.Added)
+	}
+}
+
+// sizeGuide shows the size table. The callback data after "size:"
+// is where the Back button returns, e.g. "size:menu:catalog".
+func (u *UI) sizeGuide(ctx context.Context, b *bot.Bot, update *models.Update) {
+	answer(ctx, b, update, "")
+	msg := callbackMessage(update)
+	if msg == nil {
+		return
+	}
+	t := u.t(update.CallbackQuery.From)
+	back := strings.TrimPrefix(update.CallbackQuery.Data, "size:")
+	showText(ctx, b, msg, t.SizeGuide+t.DemoBadge, backTo(t, back))
 }

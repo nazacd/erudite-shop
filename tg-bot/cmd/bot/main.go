@@ -8,14 +8,13 @@ import (
 
 	"github.com/go-telegram/bot"
 
-	"tg-bot/internal/backend"
 	"tg-bot/internal/config"
 	"tg-bot/internal/mock"
 	"tg-bot/internal/ui"
 )
 
 func main() {
-	cfg, err := config.Load("config.json")
+	cfg, err := config.Load(".env")
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -28,7 +27,10 @@ func main() {
 	ctx, cancel := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer cancel()
 
-	var be backend.Backend = mock.New(seed)
+	be, err := mock.New(seed, "data/state.json")
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	b, err := bot.New(cfg.BotToken)
 	if err != nil {

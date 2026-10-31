@@ -12,6 +12,8 @@ type Backend interface {
 	ProductsByCategory(ctx context.Context, categoryID string) ([]Product, error)
 	Product(ctx context.Context, id string) (Product, error)
 	PickupAddress(ctx context.Context) (string, error)
+	// DeliveryEstimate returns the approximate delivery cost to loc, in sum.
+	DeliveryEstimate(ctx context.Context, loc Location) (int64, error)
 
 	Cart(ctx context.Context, userID int64) (Cart, error)
 	AddToCart(ctx context.Context, userID int64, ProductID string) error

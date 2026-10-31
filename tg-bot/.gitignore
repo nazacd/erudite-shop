@@ -1,0 +1,4 @@
+config.json
+.env
+data/state.json
+data/state.json.tmp
